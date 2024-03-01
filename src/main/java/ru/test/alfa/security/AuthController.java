@@ -1,0 +1,29 @@
+package ru.test.alfa.security;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.test.alfa.security.pojo.SignInRequest;
+import ru.test.alfa.security.pojo.SignUpRequest;
+
+@RestController
+@RequestMapping("/auth")
+@RequiredArgsConstructor
+public class AuthController {
+    private final AuthenticationService authenticationService;
+
+    @PostMapping("/sign-up")
+    public ResponseEntity<JwtAuthenticationResponse> signUp(@RequestBody @Valid SignUpRequest request) {
+        return new ResponseEntity<>(authenticationService.signUp(request), HttpStatus.OK);
+    }
+
+    @PostMapping("/sign-in")
+    public  ResponseEntity<JwtAuthenticationResponse> signIn(@RequestBody @Valid SignInRequest request) {
+        return new ResponseEntity<>(authenticationService.signIn(request), HttpStatus.OK);
+    }
+}
