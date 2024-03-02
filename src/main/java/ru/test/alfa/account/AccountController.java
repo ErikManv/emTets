@@ -13,8 +13,7 @@ public class AccountController {
     private final AccountService accountService;
 
     @PostMapping("/sendMoney")
-    public  ResponseEntity<Void> moneyTransfer(@RequestBody TransferRequest request) {
+    public  void moneyTransfer(@RequestBody TransferRequest request) {
         accountService.transferFounds(request);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -13,6 +13,8 @@ import ru.test.alfa.exception.InsufficientFounds;
 import ru.test.alfa.user.User;
 import ru.test.alfa.user.UserService;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -48,21 +50,35 @@ public class AccountService {
         }
     }
 
-    @Scheduled(fixedRate = 1000)
+    @Scheduled(fixedRate = 60000)
     public void increaseBalance() {
-        List<Account> accountList = accountRepository.findAll();
+        List<Account> accountList = accountRepository.findAllByCapitalizationEnd(false);
         if(!accountList.isEmpty()) {
             for (Account account : accountList) {
                 if ((account.getBalance() * (1 + account.getRate())) / account.getInitBalance() <
                     account.getBalanceCapConstrain()) {
-                    account.setBalance(account.getBalance() * (1 + account.getRate()));
+                    if(calculateSupposedInterestAccrual(account) == calculateActualInterestAccrual(account)) {
+                        log.info("Пользователю {} начислено {}", account.getUser().getUsername(),
+                            account.getBalance() * account.getRate());
+                        account.setBalance(account.getBalance() * (1 + account.getRate()));
+                        accountRepository.save(account);
+                    } else {
+                        long missedAccrualPeriods = calculateSupposedInterestAccrual(account) - calculateActualInterestAccrual(account);
+                        account.setBalance(account.getBalance() * Math.pow ((1 + account.getRate()), missedAccrualPeriods));
+                        log.info("Выполнен пересчет балансов на случай падения серверов");
+                        accountRepository.save(account);
+                    }
+                } else {
+                    account.setCapitalizationEnd(true);
                     accountRepository.save(account);
+                    log.info("У пользователя {} достигнут лимит капитализации", account.getUser().getUsername());
                 }
+
             }
         }
     }
 
-    public User findUserByTransferRequest(TransferRequest request) {
+    private User findUserByTransferRequest(TransferRequest request) {
         if(request.getUsername() != null) {
             return userService.getByUsername(request.getUsername());
         } else if (request.getEmail() != null) {
@@ -72,5 +88,15 @@ public class AccountService {
         } else {
             throw new EmptyCredentials();
         }
+    }
+
+    public long calculateActualInterestAccrual(Account account) {
+        return Math.round(Math.log(account.getBalance()/account.getInitBalance())/Math.log(1 + account.getRate()));
+    }
+
+    public long calculateSupposedInterestAccrual(Account account) {
+        Duration depositDuration = Duration.between(account.getCreationDate(), LocalDateTime.now());
+        long periods = depositDuration.getSeconds() / account.getCapPeriod().getSeconds();
+        return Math.min(periods, account.calculateNumberOfPeriods());
     }
 }
