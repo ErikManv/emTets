@@ -7,10 +7,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.test.alfa.bankAccount.Account;
-import ru.test.alfa.bankAccount.AccountService;
-import ru.test.alfa.security.pojo.SignInRequest;
-import ru.test.alfa.security.pojo.SignUpRequest;
+import ru.test.alfa.account.Account;
+import ru.test.alfa.account.AccountService;
+import ru.test.alfa.security.requestDTO.SignInRequest;
+import ru.test.alfa.security.requestDTO.SignUpRequest;
 import ru.test.alfa.user.Role;
 import ru.test.alfa.user.User;
 import ru.test.alfa.user.UserService;
@@ -31,11 +31,10 @@ public class AuthenticationService {
     @Transactional
     public JwtAuthenticationResponse signUp(SignUpRequest request) {
 
-        Account account = Account.builder()
-            .creationDate(LocalDateTime.now())
-            .balance(request.getInitBalance())
-            .initBalance(request.getInitBalance())
-            .build();
+        Account account = new Account();
+        account.setInitBalance(request.getInitBalance());
+        account.setBalance(request.getInitBalance());
+        account.setCreationDate(LocalDateTime.now());
 
         User user = User.builder()
             .username(request.getUsername())
@@ -47,19 +46,13 @@ public class AuthenticationService {
             .fullName(request.getFullName())
             .build();
 
-        user.setAccount(accountService.createAccount(account));
-        account.setUser(userService.createUser(user));
+        user.setAccount(accountService.save(account));
+        account.setUser(userService.save(user));
 
         var jwt = jwtService.generateToken(user);
         return new JwtAuthenticationResponse(jwt);
     }
 
-    /**
-     * Аутентификация пользователя
-     *
-     * @param request данные пользователя
-     * @return токен
-     */
     public JwtAuthenticationResponse signIn(SignInRequest request) {
         userService.getByUsername(request.getUsername());
 

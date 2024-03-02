@@ -1,9 +1,12 @@
 package ru.test.alfa.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.test.alfa.user.pojo.ChangeUserInfoRequest;
-import ru.test.alfa.user.pojo.SearchRequest;
+import ru.test.alfa.user.dto.ChangeUserInfoRequest;
+import ru.test.alfa.user.dto.SearchRequest;
+import ru.test.alfa.user.dto.UserDto;
 
 import java.util.List;
 
@@ -15,57 +18,49 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/addNumber")
-    private void addNumber(@RequestHeader("Authorization") String authorizationHeader,
-                           @RequestBody ChangeUserInfoRequest request){
-        String token = extractTokenFromHeader(authorizationHeader);
-        userService.addNumber(token, request.getPhoneNumber());
+    private ResponseEntity<Void> addNumber(@RequestBody ChangeUserInfoRequest request){
+        userService.addNumber(request.getPhoneNumber());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/changeNumber")
-    private void changeNumber(@RequestHeader("Authorization") String authorizationHeader,
-                              @RequestBody ChangeUserInfoRequest request){
-        String token = extractTokenFromHeader(authorizationHeader);
-        userService.updateNumber(token, request.getOldPhoneNumber(), request.getPhoneNumber());
+    @PutMapping("/changeNumber")
+    private ResponseEntity<Void> changeNumber(@RequestBody ChangeUserInfoRequest request){
+        userService.updateNumber(request.getOldPhoneNumber(), request.getPhoneNumber());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/deleteNumber")
-    private void deleteNumber(@RequestHeader("Authorization") String authorizationHeader,
-                              @RequestBody ChangeUserInfoRequest request){
-        String token = extractTokenFromHeader(authorizationHeader);
-        userService.deleteNumber(token, request.getPhoneNumber());
+    @DeleteMapping("/deleteNumber")
+    private ResponseEntity<Void> deleteNumber(@RequestBody ChangeUserInfoRequest request){
+        userService.deleteNumber(request.getPhoneNumber());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/addEmail")
-    private void addEmail(@RequestHeader("Authorization") String authorizationHeader,
-                          @RequestBody ChangeUserInfoRequest request){
-        String token = extractTokenFromHeader(authorizationHeader);
-        userService.addEmail(token, request.getEmail());
+    private ResponseEntity<Void> addEmail(@RequestBody ChangeUserInfoRequest request){
+        userService.addEmail(request.getEmail());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/changeEmail")
-    private void changeEmail(@RequestHeader("Authorization") String authorizationHeader,
-                             @RequestBody ChangeUserInfoRequest request){
-        String token = extractTokenFromHeader(authorizationHeader);
-        userService.updateEmail(token, request.getOldEmail(), request.getEmail());
+    @PutMapping("/changeEmail")
+    private ResponseEntity<Void> changeEmail(@RequestBody ChangeUserInfoRequest request){
+        userService.updateEmail(request.getOldEmail(), request.getEmail());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/deleteEmail")
-    private void deleteEmail(@RequestHeader("Authorization") String authorizationHeader,
-                             @RequestBody ChangeUserInfoRequest request){
-        String token = extractTokenFromHeader(authorizationHeader);
-        userService.deleteEmail(token, request.getEmail());
+    @DeleteMapping("/deleteEmail")
+    private ResponseEntity<Void> deleteEmail(@RequestBody ChangeUserInfoRequest request){
+        userService.deleteEmail(request.getEmail());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/searchUser")
-    private List<User> findByCriteria(@RequestBody SearchRequest request) {
-        System.out.println(request);
-        return userService.findAllByCriteria(request);
-    }
-
-        private String extractTokenFromHeader(String authorizationHeader) {
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            return authorizationHeader.substring(7);
-        }
-        return null;
+    @GetMapping("/filter")
+    private ResponseEntity<List<UserDto>> findByCriteria(@RequestBody SearchRequest request,
+                                                         @RequestParam(value = "pageNumber", defaultValue = "1", required = false)
+                                                         Integer pageNumber,
+                                                         @RequestParam(value = "limit", defaultValue = "10", required = false)
+                                                             Integer limit,
+                                                         @RequestParam(value = "ascending", defaultValue = "false", required = false)
+                                                             boolean ascending) {
+        return new ResponseEntity<>(userService.findAllByCriteria(pageNumber, limit, request, ascending), HttpStatus.OK);
     }
 }

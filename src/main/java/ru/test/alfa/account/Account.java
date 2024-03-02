@@ -1,9 +1,8 @@
-package ru.test.alfa.bankAccount;
+package ru.test.alfa.account;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
-import org.springframework.scheduling.annotation.Scheduled;
 import ru.test.alfa.user.User;
 
 import java.time.LocalDateTime;
@@ -33,7 +32,7 @@ public class Account {
     @Column(name = "creation_date", nullable = false)
     private LocalDateTime creationDate;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -41,4 +40,8 @@ public class Account {
 
     @Column(name = "capitalization_constrain")
     private final double balanceCapConstrain = 2.07;
+
+    public void increaseBalanceByRate() {
+        this.balance *= (1 + this.rate);
+    }
 }

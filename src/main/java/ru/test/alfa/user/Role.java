@@ -8,7 +8,5 @@ public enum Role {
     USER("USER"),
     ANON("ANON");
 
-
-    private final String vale;
-
+    private final String value;
 }

@@ -5,7 +5,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.test.alfa.bankAccount.Account;
+import ru.test.alfa.account.Account;
 
 import java.time.LocalDate;
 import java.util.Collection;

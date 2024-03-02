@@ -1,16 +1,23 @@
-package ru.test.alfa.bankAccount;
+package ru.test.alfa.account;
 
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import ru.test.alfa.bankAccount.pojo.TransferRequest;
+import ru.test.alfa.account.requestDTO.TransferRequest;
+import ru.test.alfa.exception.EmptyCredentials;
+import ru.test.alfa.exception.InsufficientFounds;
 import ru.test.alfa.security.JwtService;
 import ru.test.alfa.user.User;
 import ru.test.alfa.user.UserService;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @Service
 @RequiredArgsConstructor
@@ -19,17 +26,17 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final UserService userService;
-    private final JwtService jwtService;
 
+    private static final Logger log = LoggerFactory.getLogger(AccountService.class);
 
-    public Account createAccount(Account account) {
+    public Account save(Account account) {
         return accountRepository.save(account);
     }
 
-    public void transferFounds(String token, TransferRequest request) {
+    public void transferFounds(TransferRequest request) {
 
-        User sender = userService.getByUsername(jwtService.extractUserName(token));
-        User recipient = userService.getByUsername(request.getUsername());
+        User sender = userService.getCurrentUser();
+        User recipient = findUserByTransferRequest(request);
 
         double senderBalance = sender.getAccount().getBalance();
         double recipientBalance = recipient.getAccount().getBalance();
@@ -39,10 +46,13 @@ public class AccountService {
             recipient.getAccount().setBalance(recipientBalance + request.getAmount());
             userService.save(sender);
             userService.save(recipient);
+            log.info("Перевод суммы {} пользователю {} совершен", request.getAmount(), recipient.getUsername());
+        } else {
+            throw new InsufficientFounds(String.valueOf(sender.getAccount().getBalance()));
         }
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 1000)
     public void increaseBalance() {
         List<Account> accountList = accountRepository.findAll();
         if(!accountList.isEmpty()) {
@@ -51,12 +61,20 @@ public class AccountService {
                     account.getBalanceCapConstrain()) {
                     account.setBalance(account.getBalance() * (1 + account.getRate()));
                     accountRepository.save(account);
-                } else {
-                    return;
                 }
             }
+        }
+    }
+
+    public User findUserByTransferRequest(TransferRequest request) {
+        if(request.getUsername() != null) {
+            return userService.getByUsername(request.getUsername());
+        } else if (request.getEmail() != null) {
+            return userService.getByEmail(request.getEmail());
+        } else if (request.getPhoneNumber() != null) {
+            return userService.getByPhoneNumber(request.getPhoneNumber());
         } else {
-            return;
+            throw new EmptyCredentials();
         }
     }
 }
