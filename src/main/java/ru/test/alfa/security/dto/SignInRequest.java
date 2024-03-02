@@ -1,4 +1,4 @@
-package ru.test.alfa.security.requestDTO;
+package ru.test.alfa.security.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

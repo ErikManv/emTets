@@ -1,4 +1,4 @@
-package ru.test.alfa.account.requestDTO;
+package ru.test.alfa.account.dto;
 
 import jakarta.validation.constraints.Email;
 import lombok.Data;

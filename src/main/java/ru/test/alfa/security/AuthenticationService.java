@@ -2,6 +2,8 @@ package ru.test.alfa.security;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,8 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.test.alfa.account.Account;
 import ru.test.alfa.account.AccountService;
-import ru.test.alfa.security.requestDTO.SignInRequest;
-import ru.test.alfa.security.requestDTO.SignUpRequest;
+import ru.test.alfa.security.dto.SignInRequest;
+import ru.test.alfa.security.dto.SignUpRequest;
 import ru.test.alfa.user.Role;
 import ru.test.alfa.user.User;
 import ru.test.alfa.user.UserService;
@@ -25,8 +27,9 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-
     private final AccountService accountService;
+
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationService.class);
 
     @Transactional
     public JwtAuthenticationResponse signUp(SignUpRequest request) {
@@ -49,6 +52,8 @@ public class AuthenticationService {
         user.setAccount(accountService.save(account));
         account.setUser(userService.save(user));
 
+        log.info("Пользователь {} создан", request.getUsername());
+
         var jwt = jwtService.generateToken(user);
         return new JwtAuthenticationResponse(jwt);
     }
@@ -66,6 +71,9 @@ public class AuthenticationService {
             .loadUserByUsername(request.getUsername());
 
         var jwt = jwtService.generateToken(user);
+
+        log.info("Пользователь {} авторизован", request.getUsername());
+
         return new JwtAuthenticationResponse(jwt);
     }
 }

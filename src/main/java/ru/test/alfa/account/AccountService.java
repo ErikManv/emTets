@@ -7,17 +7,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import ru.test.alfa.account.requestDTO.TransferRequest;
+import ru.test.alfa.account.dto.TransferRequest;
 import ru.test.alfa.exception.EmptyCredentials;
 import ru.test.alfa.exception.InsufficientFounds;
-import ru.test.alfa.security.JwtService;
 import ru.test.alfa.user.User;
 import ru.test.alfa.user.UserService;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 @Service
 @RequiredArgsConstructor

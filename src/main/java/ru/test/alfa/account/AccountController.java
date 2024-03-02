@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.test.alfa.account.requestDTO.TransferRequest;
-import ru.test.alfa.security.*;
+import ru.test.alfa.account.dto.TransferRequest;
 
 @RestController
 @RequestMapping("/api/account")

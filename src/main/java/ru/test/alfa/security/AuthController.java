@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.test.alfa.security.requestDTO.SignInRequest;
-import ru.test.alfa.security.requestDTO.SignUpRequest;
+import ru.test.alfa.security.dto.SignInRequest;
+import ru.test.alfa.security.dto.SignUpRequest;
 
 @RestController
 @RequestMapping("/auth")
