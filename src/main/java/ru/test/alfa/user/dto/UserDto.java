@@ -1,7 +1,6 @@
 package ru.test.alfa.user.dto;
 
 import lombok.*;
-import ru.test.alfa.account.Account;
 
 import java.time.LocalDate;
 import java.util.List;
