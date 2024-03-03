@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     @PostMapping("/addNumber")
     private ResponseEntity<Void> addNumber(@RequestBody ChangeUserInfoRequest request){

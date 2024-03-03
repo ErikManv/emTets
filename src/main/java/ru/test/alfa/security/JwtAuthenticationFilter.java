@@ -14,7 +14,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ru.test.alfa.user.UserService;
+import ru.test.alfa.user.UserServiceImpl;
 
 import java.io.IOException;
 
@@ -25,7 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String HEADER_NAME = "Authorization";
 
     private final JwtService jwtService;
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     @Override
     protected void doFilterInternal(

@@ -16,7 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import ru.test.alfa.user.UserService;
+import ru.test.alfa.user.UserServiceImpl;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
