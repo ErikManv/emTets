@@ -13,8 +13,6 @@ import ru.test.alfa.exception.InsufficientFounds;
 import ru.test.alfa.user.User;
 import ru.test.alfa.user.UserService;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -36,17 +34,17 @@ public class AccountService {
         User sender = userService.getCurrentUser();
         User recipient = findUserByTransferRequest(request);
 
-        double senderBalance = sender.getAccount().getBalance();
-        double recipientBalance = recipient.getAccount().getBalance();
+        double senderBalance = sender.getAccount().getCardBalance();
+        double recipientBalance = recipient.getAccount().getCardBalance();
 
-        if(sender.getAccount().getBalance() - request.getAmount() > 0) {
-            sender.getAccount().setBalance(senderBalance - request.getAmount());
-            recipient.getAccount().setBalance(recipientBalance + request.getAmount());
+        if(sender.getAccount().getCardBalance() - request.getAmount() > 0) {
+            sender.getAccount().setCardBalance(senderBalance - request.getAmount());
+            recipient.getAccount().setCardBalance(recipientBalance + request.getAmount());
             userService.save(sender);
             userService.save(recipient);
             log.info("Перевод суммы {} пользователю {} совершен", request.getAmount(), recipient.getUsername());
         } else {
-            throw new InsufficientFounds(String.valueOf(sender.getAccount().getBalance()));
+            throw new InsufficientFounds(String.valueOf(sender.getAccount().getCardBalance()));
         }
     }
 
@@ -55,19 +53,14 @@ public class AccountService {
         List<Account> accountList = accountRepository.findAllByCapitalizationEnd(false);
         if(!accountList.isEmpty()) {
             for (Account account : accountList) {
-                if ((account.getBalance() * (1 + account.getRate())) / account.getInitBalance() <
-                    account.getBalanceCapConstrain()) {
-                    if(calculateSupposedInterestAccrual(account) == calculateActualInterestAccrual(account)) {
+                if ((account.getDeposit() * (1 + account.getRate())) / account.getInitDeposit() <
+                    account.getDepositCapConstrain()) {
+
                         log.info("Пользователю {} начислено {}", account.getUser().getUsername(),
-                            account.getBalance() * account.getRate());
-                        account.setBalance(account.getBalance() * (1 + account.getRate()));
+                            account.getDeposit() * account.getRate());
+
+                        account.setDeposit(account.getDeposit() * (1 + account.getRate()));
                         accountRepository.save(account);
-                    } else {
-                        long missedAccrualPeriods = calculateSupposedInterestAccrual(account) - calculateActualInterestAccrual(account);
-                        account.setBalance(account.getBalance() * Math.pow ((1 + account.getRate()), missedAccrualPeriods));
-                        log.info("Выполнен пересчет балансов на случай падения серверов");
-                        accountRepository.save(account);
-                    }
                 } else {
                     account.setCapitalizationEnd(true);
                     accountRepository.save(account);
@@ -88,15 +81,5 @@ public class AccountService {
         } else {
             throw new EmptyCredentials();
         }
-    }
-
-    public long calculateActualInterestAccrual(Account account) {
-        return Math.round(Math.log(account.getBalance()/account.getInitBalance())/Math.log(1 + account.getRate()));
-    }
-
-    public long calculateSupposedInterestAccrual(Account account) {
-        Duration depositDuration = Duration.between(account.getCreationDate(), LocalDateTime.now());
-        long periods = depositDuration.getSeconds() / account.getCapPeriod().getSeconds();
-        return Math.min(periods, account.calculateNumberOfPeriods());
     }
 }

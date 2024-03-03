@@ -19,19 +19,20 @@ public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_id_gen")
-    @SequenceGenerator(name = "account_id_gen", initialValue = 1000)
+    @SequenceGenerator(name = "account_id_gen", initialValue = 1000, allocationSize = 1)
     private Long id;
 
     @Positive
-    @Column(nullable = false)
-    private double balance;
+    @Column(name = "card_balance", nullable = false)
+    private double cardBalance;
 
     @Positive
-    @Column(name = "init_balance", nullable = false)
-    private double initBalance;
+    @Column(nullable = false)
+    private double deposit;
 
-    @Column(name = "creation_date", nullable = false)
-    private LocalDateTime creationDate;
+    @Positive
+    @Column(name = "init_deposit", nullable = false)
+    private double initDeposit;
 
     @OneToOne
     @JoinColumn(name = "user_id")
@@ -39,16 +40,17 @@ public class Account {
 
     private final double rate = 0.05;
 
-    @Column(name = "cap_period")
-    private Duration capPeriod = Duration.ofMinutes(1);
-
     @Column(name = "cap_end")
     private boolean capitalizationEnd = false;
 
-    @Column(name = "capitalization_constrain")
-    private final double balanceCapConstrain = 2.07;
+    @Column(name = "cap_constrain")
+    private final double depositCapConstrain = 2.07;
 
-    public long calculateNumberOfPeriods() {
-        return Math.round(Math.log(balanceCapConstrain)/Math.log(rate + 1)- 1);
+    public double calculateNumberOfPeriods() {
+        return Math.log(deposit/initDeposit)/Math.log(rate + 1);
+    }
+
+    public double calculateMaxNumberOfPeriods() {
+        return Math.log(depositCapConstrain)/Math.log(rate + 1);
     }
 }

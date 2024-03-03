@@ -1,6 +1,7 @@
 package ru.test.alfa.exception;
 
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -53,11 +54,20 @@ public class ErrorHandler {
         );
     }
 
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleDuplicateException(final DataIntegrityViolationException e) {
         return new ErrorResponse(
             "Неверный формат данных", e.getMostSpecificCause().getMessage()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleDeleteLast(final DeleteLastException e) {
+        return new ErrorResponse(
+            "Неверный запрос", e.getMessage()
         );
     }
 

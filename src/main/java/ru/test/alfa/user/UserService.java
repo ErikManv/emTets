@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import ru.test.alfa.exception.DeleteLastException;
 import ru.test.alfa.exception.EmailNotFoundException;
 import ru.test.alfa.exception.PhoneNumberNotFoundException;
 import ru.test.alfa.exception.UserNotFoundException;
@@ -102,7 +103,7 @@ public class UserService {
     public void updateNumber(String oldNumber, String newNumber) {
         User user = getCurrentUser();
         if(user.getPhoneNumbers().contains(oldNumber)){
-            deleteNumber(oldNumber);
+            user.getPhoneNumbers().remove(oldNumber);
             user.getPhoneNumbers().add(newNumber);
             log.info("номер телефона {} изменен на {}", oldNumber, newNumber);
             userRepository.save(user);
@@ -117,6 +118,8 @@ public class UserService {
             user.getPhoneNumbers().remove(number);
             log.info("номер телефона {} удален", number);
             userRepository.save(user);
+        } else if (user.getPhoneNumbers().size() == 1 && user.getPhoneNumbers().contains(number)) {
+            throw new DeleteLastException("телефон");
         } else {
             throw new PhoneNumberNotFoundException(number);
         }
@@ -132,10 +135,10 @@ public class UserService {
     public void updateEmail(String oldEmail, String newEmail) {
         User user = getCurrentUser();
         if(user.getEmail().contains(oldEmail)){
-            deleteEmail(oldEmail);
+            user.getEmail().remove(oldEmail);
             user.getEmail().add(newEmail);
-            log.info("email {} изменен на {}", oldEmail, newEmail);
             userRepository.save(user);
+            log.info("email {} изменен на {}", oldEmail, newEmail);
         } else {
             throw new PhoneNumberNotFoundException(oldEmail);
         }
@@ -147,6 +150,8 @@ public class UserService {
             user.getEmail().remove(email);
             log.info("email {} удален", email);
             userRepository.save(user);
+        } else if (user.getEmail().size() == 1 && user.getEmail().contains(email)) {
+            throw new DeleteLastException("email");
         } else {
             throw new EmailNotFoundException(email);
         }
@@ -178,7 +183,8 @@ public class UserService {
 
     private UserDto userToDto(User user) {
         return UserDto.builder()
-            .balance(user.getAccount().getBalance())
+            .cardBalance(user.getAccount().getCardBalance())
+            .deposit(user.getAccount().getDeposit())
             .dateOfBirth(user.getDateOfBirth())
             .phoneNumbers(user.getPhoneNumbers())
             .fullName(user.getFullName())

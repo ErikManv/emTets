@@ -1,5 +1,6 @@
 package ru.test.alfa.user;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import ru.test.alfa.user.dto.UserDto;
 
 import java.util.List;
 
+@Tag(name = "user_controller")
 @RestController
 @RequestMapping("api/user")
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("/changeNumber")
+    @PutMapping("/updateNumber")
     private ResponseEntity<Void> changeNumber(@RequestBody ChangeUserInfoRequest request){
         userService.updateNumber(request.getOldPhoneNumber(), request.getPhoneNumber());
         return new ResponseEntity<>(HttpStatus.OK);

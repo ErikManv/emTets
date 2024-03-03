@@ -1,4 +1,4 @@
-package ru.test.alfa.security.dto;
+package ru.test.alfa.admin.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -23,8 +23,11 @@ public class SignUpRequest {
     @NotBlank(message = "Телефон не может быть пустыми")
     private String phoneNumber;
 
-    @NotNull(message = "Баланс не может быть пустыми")
-    private double initBalance;
+    @NotNull(message = "Баланс карты не может быть пустыми")
+    private double cardBalance;
+
+    @NotNull(message = "Депозит не может быть пустыми")
+    private double initDeposit;
 
     @NotNull(message = "Дата рождения не может быть пустой")
     private LocalDate dateOfBirth;

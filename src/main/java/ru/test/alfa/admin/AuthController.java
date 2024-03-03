@@ -1,5 +1,6 @@
-package ru.test.alfa.security;
+package ru.test.alfa.admin;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -8,9 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.test.alfa.security.dto.SignInRequest;
-import ru.test.alfa.security.dto.SignUpRequest;
-
+import ru.test.alfa.admin.dto.SignInRequest;
+import ru.test.alfa.admin.dto.SignUpRequest;
+import ru.test.alfa.security.JwtAuthenticationResponse;
+@Tag(name = "admin_controller")
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package ru.test.alfa.security;
+package ru.test.alfa.admin;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -11,13 +11,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.test.alfa.account.Account;
 import ru.test.alfa.account.AccountService;
-import ru.test.alfa.security.dto.SignInRequest;
-import ru.test.alfa.security.dto.SignUpRequest;
+import ru.test.alfa.admin.dto.SignInRequest;
+import ru.test.alfa.admin.dto.SignUpRequest;
+import ru.test.alfa.security.JwtAuthenticationResponse;
+import ru.test.alfa.security.JwtService;
 import ru.test.alfa.user.Role;
 import ru.test.alfa.user.User;
 import ru.test.alfa.user.UserService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -35,9 +36,9 @@ public class AuthenticationService {
     public JwtAuthenticationResponse signUp(SignUpRequest request) {
 
         Account account = new Account();
-        account.setInitBalance(request.getInitBalance());
-        account.setBalance(request.getInitBalance());
-        account.setCreationDate(LocalDateTime.now());
+        account.setDeposit(request.getInitDeposit());
+        account.setInitDeposit(request.getInitDeposit());
+        account.setCardBalance(request.getCardBalance());
 
         User user = User.builder()
             .username(request.getUsername())
@@ -49,10 +50,10 @@ public class AuthenticationService {
             .fullName(request.getFullName())
             .build();
 
+        log.info("Пользователь {} создан", request.getUsername());
+
         user.setAccount(accountService.save(account));
         account.setUser(userService.save(user));
-
-        log.info("Пользователь {} создан", request.getUsername());
 
         var jwt = jwtService.generateToken(user);
         return new JwtAuthenticationResponse(jwt);

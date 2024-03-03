@@ -17,6 +17,7 @@ public class UserDto {
     private List<String> phoneNumbers;
     private String fullName;
     private LocalDate dateOfBirth;
-    private double balance;
+    private double cardBalance;
+    private double deposit;
 
 }
