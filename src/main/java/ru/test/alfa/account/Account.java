@@ -5,9 +5,6 @@ import jakarta.validation.constraints.Positive;
 import lombok.*;
 import ru.test.alfa.user.User;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
 @Entity
 @Builder
 @Getter
